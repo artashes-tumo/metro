@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09111e">
+<title>Vienna Metro Driver: U1 Adventure</title>
+<style>
+:root{font-family:Inter,'Segoe UI',Arial,sans-serif;color:#f5faff;background:#071522;font-synthesis:none}*{box-sizing:border-box}body{margin:0;overflow:hidden}button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #6ee7ff;outline-offset:3px}#app{position:relative;width:100vw;height:100vh;min-height:590px;overflow:hidden;background:linear-gradient(#0a1529,#111c33)}#world{position:absolute;inset:0;width:100%;height:100%;display:block}.world-tint{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,14,26,.25),transparent 25%,transparent 78%,rgba(5,14,26,.25)),linear-gradient(0deg,rgba(2,8,18,.72),transparent 52%)}.cab-top{position:absolute;left:0;right:0;top:0;height:93px;background:linear-gradient(#152337,#0b1524);border-bottom:7px solid #33475e;box-shadow:0 8px 20px #0008;z-index:1}.cab-left,.cab-right{position:absolute;top:77px;bottom:150px;width:23px;background:linear-gradient(90deg,#0e1b2b,#4b5c70,#142135);box-shadow:2px 0 13px #0008;z-index:1}.cab-left{left:0}.cab-right{right:0;transform:scaleX(-1)}.mirror{position:absolute;left:12%;top:72px;width:110px;height:29px;background:#192637;border:5px solid #4b6076;border-radius:5px;transform:skew(-8deg)}.cab-marker{position:absolute;right:7%;top:61px;background:#141f31;padding:5px 13px;color:#f4f4f6;letter-spacing:2px;font-size:11px;border:1px solid #3e566d;border-radius:4px}.cab-marker span{color:#ea313f}.topbar{position:absolute;z-index:4;top:8px;left:25px;right:25px;height:55px;display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{display:flex;align-items:center;gap:12px}.brand strong{display:block;letter-spacing:1.15px;font-size:clamp(12px,1.4vw,19px);white-space:nowrap}.brand small{display:block;color:#8cacc4;letter-spacing:1.1px;font-size:9px;margin-top:4px}.route-label{background:#e6253a;border-radius:9px;padding:9px 11px;font-weight:900;font-size:22px;box-shadow:0 1px 15px #e6253a55}.topstats{display:flex;align-items:center;gap:13px}.topstats .tag{font-size:11px;letter-spacing:.8px;border-radius:20px;padding:8px 13px;background:#223a50;color:#8de6ff}.stars{color:#ffcc62;font-size:13px;white-space:nowrap}.topstats button{background:#182a3c;border:1px solid #3d5569;border-radius:9px;color:#d4e6f4;padding:9px 13px;font-weight:700;font-size:12px}.topstats button:hover{background:#2d526d}.station-sign{position:absolute;top:24%;left:50%;transform:translateX(-50%);z-index:2;text-align:center;background:rgba(8,19,32,.84);border:1px solid #48dfff;border-radius:9px;padding:10px 20px;box-shadow:0 0 30px #24cffb3a;letter-spacing:1.7px;font-size:12px;font-weight:800;color:#89eaff;white-space:nowrap}.station-sign strong{display:block;font-size:clamp(18px,2.6vw,36px);color:white;margin:4px}.station-sign small{font-size:11px;letter-spacing:.5px;color:#bbd9e7}.mission-bar{position:absolute;z-index:4;top:105px;left:clamp(24px,5%,90px);right:clamp(24px,5%,90px);max-width:800px;margin:auto;background:rgba(9,21,36,.82);border:1px solid #385875;border-radius:14px;padding:11px 17px;display:flex;align-items:center;gap:14px;box-shadow:0 7px 32px #0006;backdrop-filter:blur(8px)}.mission-icon{color:#ffcc59;font-size:30px}.mission-bar small{display:block;color:#5ce4fb;font-weight:800;font-size:10px;letter-spacing:1.2px}.mission-bar strong{font-size:13px;font-weight:650}.challenge-status{margin-left:auto;font-size:10px;background:#263c50;color:#a9d2e6;border-radius:20px;padding:6px 9px;white-space:nowrap}.cab-dashboard{position:absolute;z-index:4;bottom:124px;left:24px;right:24px;min-height:123px;border:1px solid #455e75;border-radius:18px 18px 7px 7px;background:linear-gradient(145deg,rgba(25,43,62,.97),rgba(10,22,36,.97));box-shadow:0 -9px 25px #000a,0 13px 50px #000a;display:grid;grid-template-columns:minmax(115px,170px) minmax(180px,1.5fr) minmax(116px,.8fr) minmax(145px,1.1fr);gap:12px;padding:13px}.cab-dashboard>div{border-right:1px solid #35506a;padding-right:14px}.cab-dashboard>div:last-child{border:0;padding-right:0}.speed-unit{display:flex;align-items:center;justify-content:space-around;gap:7px}.speed-dial{height:93px;width:93px;border-radius:50%;border:9px solid #29586b;background:radial-gradient(circle at 50% 60%,#172838,#0a101d);display:flex;justify-content:center;align-items:center;box-shadow:inset 0 0 9px #000c,0 0 0 2px #60b9d1}.speed-dial span{font-size:34px;font-weight:850;color:#dbfbff;font-variant-numeric:tabular-nums}.speed-unit small,.trip-display small,.status-light small,.passenger-panel small{font-size:10px;letter-spacing:1.15px;color:#8cadc3;font-weight:750}.speed-unit strong{display:block;color:#8ab8cf;font-size:13px}.trip-display{display:flex;flex-direction:column;justify-content:center;gap:7px}.trip-display>strong{font-size:clamp(19px,2.2vw,28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.trip-display small span{color:#61e4fe}.progress-track{width:100%;height:8px;border-radius:7px;background:#203a4d;overflow:hidden}.progress-track>div{height:100%;width:0;background:linear-gradient(90deg,#fa334f,#ff9b63);transition:width .3s}.status-display{display:flex;flex-direction:column;justify-content:center;gap:16px}.status-light{display:flex;align-items:center;gap:12px}.status-light strong{display:block;font-size:12px;margin-top:3px}.lamp{display:block;width:15px;height:15px;flex-shrink:0;border-radius:50%;background:#206e62;box-shadow:0 0 15px #23d5b5}.lamp.red{background:#f44d62;box-shadow:0 0 17px #f34659}.lamp.yellow{background:#fcd260;box-shadow:0 0 17px #ffd45a}.passenger-panel{display:flex;flex-direction:column;justify-content:center;gap:7px}.passenger-panel small span{color:#95ffcb}.passenger-panel>span{font-size:10px;color:#9fc4d9}.passenger-viz{display:flex;align-items:flex-end;gap:6px;height:35px}.passenger-viz .person{height:23px;width:10px;position:relative;background:var(--shirt,#36c3eb);border-radius:4px 4px 2px 2px}.passenger-viz .person:before{content:'';position:absolute;top:-9px;left:1px;width:8px;height:8px;border-radius:50%;background:#f1c9a3}.passenger-viz .person.sitting{height:17px;transform:translateY(4px)}.passenger-viz .person.sitting:after{content:'▂';position:absolute;bottom:-2px;left:7px;color:#a7c9e1}.announcement{position:absolute;z-index:3;bottom:267px;left:50%;transform:translateX(-50%);padding:9px 16px;border-radius:25px;background:rgba(8,22,39,.84);border:1px solid #34718a;color:#d1f4ff;font-size:12px;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 6px 23px #0007}.announcement-icon{color:#63edfc;margin-right:8px}.control-panel{position:absolute;z-index:5;bottom:32px;left:24px;right:24px;display:flex;justify-content:space-between;gap:10px}.control-group{display:flex;gap:8px}.control{height:80px;min-width:93px;max-width:155px;border:1px solid #465b75;border-radius:12px;background:linear-gradient(#283c52,#14263a);color:#e7f4ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 #081321,0 8px 20px #0006;user-select:none;touch-action:none;transition:background .12s,transform .12s}.control:active,.control.held{transform:translateY(3px);box-shadow:0 2px 0 #081321;background:#416381}.control span{font-size:20px;line-height:23px}.control strong{font-size:10px;letter-spacing:.3px}.control small{font-size:9px;color:#adc2d4}.action-go{background:linear-gradient(#247a71,#12453e);border-color:#43b9a7}.action-brake{background:linear-gradient(#ae712c,#69421e);border-color:#dba751}.action-emergency{background:linear-gradient(#a43f50,#622335);border-color:#e66e87}.action-door{border-color:#6399d0}.control:hover{filter:brightness(1.14)}.footnote{position:absolute;z-index:4;bottom:8px;left:29px;right:29px;display:flex;justify-content:space-between;color:#8aa1b4;font-size:9px;letter-spacing:.8px}.toast{position:absolute;z-index:10;top:195px;left:50%;transform:translate(-50%,-12px);background:#142a3be8;border:1px solid #66d6f9;color:#f6feff;padding:14px 22px;border-radius:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;font-size:15px;font-weight:750;text-align:center;box-shadow:0 14px 35px #0009}.toast.visible{opacity:1;transform:translate(-50%,0)}.overlay{position:absolute;z-index:20;inset:0;background:rgba(3,10,22,.80);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:22px}.hidden{display:none!important}.modal{background:radial-gradient(ellipse at top,#223f5a,#101d31 62%);border:1px solid #5a879d;box-shadow:0 20px 100px #000d,0 0 70px #44d5ff20;border-radius:23px;padding:30px 39px;width:min(620px,94vw);text-align:center;max-height:95vh;overflow:auto}.logo-orbit{font-size:56px;filter:drop-shadow(0 0 18px #65d9f7)}.eyebrow{font-size:11px;color:#7ce9ff;letter-spacing:3px;font-weight:850}.modal h1{font-size:clamp(28px,4vw,43px);line-height:1.1;letter-spacing:-1.4px;margin:14px 0}.modal h1 em{display:block;color:#ff7182;font-style:normal}.modal p{font-size:15px;line-height:1.6;color:#c0d5e5}.modal p strong{color:#fff}.feature-pills{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:21px 0}.feature-pills span{border:1px solid #47758e;border-radius:24px;padding:8px 11px;background:#1c354b;color:#d2effc;font-size:11px}.modal-actions{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}.primary,.outline{border-radius:12px;padding:15px 22px;font-size:13px;font-weight:850;letter-spacing:.6px}.primary{color:#fff;background:linear-gradient(120deg,#e5213e,#fb6657);border:1px solid #ff7f88;box-shadow:0 5px 20px #e5213e66}.outline{color:#d4effa;border:1px solid #5e92a6;background:#234057}.primary:hover,.outline:hover{filter:brightness(1.16)}.instruction{display:block;color:#b4c8db;font-size:11px;line-height:1.65;margin-top:20px}.disclaimer{display:block;color:#7891a2;font-size:10px;margin-top:9px}.help-modal{position:relative;text-align:left;max-width:660px}.help-modal h2{letter-spacing:1px}.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.help-grid>div{display:flex;gap:10px;align-items:center;padding:9px;border:1px solid #39546b;background:#142b3d;border-radius:9px;font-size:12px}.help-grid span{color:#bed6e6}.x{position:absolute;right:15px;top:14px;border:0;color:#fff;font-size:25px;background:transparent}kbd{background:#2b4b62;padding:5px 8px;border:1px solid #52819a;border-radius:5px;color:#fff;white-space:nowrap}.help-modal .primary{display:block;margin:16px auto 0}@media(max-width:930px){.control{min-width:73px;height:72px}.control strong{font-size:9px}.control small{font-size:8px}.cab-dashboard{grid-template-columns:120px 1.3fr 115px;bottom:118px}.passenger-panel{display:none}.topstats .tag{display:none}}@media(max-width:700px){.brand small,.topstats .stars,.cab-marker,.control small,.footnote{display:none}.topbar{left:14px;right:14px}.mission-bar{top:91px;left:12px;right:12px}.cab-dashboard{left:10px;right:10px;grid-template-columns:90px 1fr 90px;gap:5px;padding:8px;bottom:136px;min-height:99px}.speed-dial{width:62px;height:62px;border-width:6px}.speed-dial span{font-size:24px}.speed-unit>div:last-child{display:none}.trip-display strong{font-size:16px}.trip-display small{font-size:8px}.status-light{gap:5px}.status-light strong{font-size:9px}.status-light small{font-size:8px}.control-panel{left:8px;right:8px;bottom:36px;display:block}.control-group{justify-content:space-around;gap:4px;margin-top:5px}.control{flex:1;min-width:0;max-width:none;height:44px}.control span{font-size:14px;line-height:15px}.control strong{font-size:8px}.announcement{bottom:246px;font-size:10px}.modal{padding:21px}.help-grid{grid-template-columns:1fr}}
+
+/* V2.2: Compact cockpit, larger windscreen and live side mirror */
+#app{min-height:420px}
+.cab-top{height:63px;border-bottom-width:5px}
+.cab-left,.cab-right{top:59px;bottom:114px;width:14px}
+.cab-marker{top:42px;font-size:9px;padding:3px 8px}
+.topbar{top:4px;left:16px;right:16px;height:43px;gap:8px}
+.brand{gap:8px}.route-label{padding:5px 8px;font-size:17px;border-radius:7px}
+.brand strong{font-size:clamp(12px,1.3vw,16px)}.brand small{font-size:8px;margin-top:2px}
+.topstats{gap:7px}.topstats .tag{font-size:9px;padding:5px 9px}.stars{font-size:11px}
+.topstats button{padding:6px 9px;font-size:11px;border-radius:7px}
+.mission-bar{top:68px;left:50%;right:auto;transform:translateX(-50%);width:min(600px,54vw);max-width:none;min-height:42px;padding:6px 12px;gap:9px;border-radius:9px}
+.mission-icon{font-size:20px}.mission-bar small{font-size:8px}.mission-bar strong{font-size:11px;line-height:1.2;display:block}.challenge-status{padding:4px 6px;font-size:9px}
+.station-sign{top:24%;padding:6px 12px;font-size:9px;border-radius:7px}.station-sign strong{font-size:clamp(15px,2vw,23px);margin:2px}.station-sign small{font-size:9px}
+.cab-dashboard{left:16px;right:16px;bottom:78px;min-height:72px;grid-template-columns:minmax(80px,100px) minmax(130px,1.6fr) minmax(95px,.8fr) minmax(115px,.9fr);gap:9px;padding:7px 10px;border-radius:12px 12px 4px 4px}
+.cab-dashboard>div{padding-right:10px}.speed-dial{width:61px;height:61px;border-width:6px}.speed-dial span{font-size:23px}.speed-unit{gap:3px}.speed-unit small,.trip-display small,.status-light small,.passenger-panel small{font-size:8px;letter-spacing:.7px}.speed-unit strong{font-size:10px}.trip-display{gap:3px}.trip-display>strong{font-size:clamp(15px,1.7vw,21px)}.progress-track{height:5px}.status-display{gap:5px}.status-light{gap:6px}.status-light strong{font-size:10px;margin-top:1px}.lamp{width:10px;height:10px}.passenger-panel{gap:4px}.passenger-panel>span{font-size:9px}.passenger-viz{height:22px;gap:4px}.passenger-viz .person{width:7px;height:14px}.passenger-viz .person:before{width:6px;height:6px;top:-6px;left:.5px}.passenger-viz .person.sitting{height:12px;transform:translateY(2px)}
+.announcement{bottom:159px;padding:5px 12px;font-size:10px;max-width:70%}
+.control-panel{left:16px;right:16px;bottom:13px;gap:7px}.control-group{gap:6px}.control{height:55px;min-width:75px;max-width:120px;border-radius:9px;gap:0;box-shadow:0 3px 0 #081321,0 5px 12px #0006}.control span{font-size:16px;line-height:18px}.control strong{font-size:9px}.control small{font-size:8px}.footnote{bottom:2px;font-size:8px;left:17px;right:17px}.toast{top:151px;padding:9px 13px;font-size:12px}
+.rear-mirror{position:absolute;z-index:5;top:64px;right:20px;width:226px;max-width:26vw;background:linear-gradient(135deg,#2e3e53,#0c1d2d);border:4px solid #667b8d;border-radius:10px;box-shadow:0 8px 0 #081626,0 12px 26px #000b,0 0 0 1px #dce9ef55;overflow:hidden;pointer-events:none}
+.mirror-heading,.mirror-footer{display:flex;justify-content:space-between;align-items:center;gap:5px;padding:3px 7px;background:#10253a;color:#99dce8;font-size:8px;font-weight:800;letter-spacing:.35px;white-space:nowrap;overflow:hidden}.mirror-heading b{color:#e7fbff;font-size:8px;overflow:hidden;text-overflow:ellipsis}.mirror-footer{color:#9badbb;font-size:8px}
+#mirrorCanvas{display:block;width:100%;height:84px;object-fit:cover;background:#112b40}
+.home-route{margin:16px auto 10px;display:flex;align-items:center;justify-content:center;gap:10px;color:#dff6fc;font-size:12px;font-weight:850}.home-route .route-line{width:min(180px,29%);height:5px;background:linear-gradient(90deg,#ec263d,#fc6873);border-radius:10px;position:relative}.home-route .route-line:before,.home-route .route-line:after{content:'';position:absolute;top:-4px;width:12px;height:12px;border:2px solid #f6fcff;border-radius:50%;background:#ec263d}.home-route .route-line:before{left:0}.home-route .route-line:after{right:0}
+#homeShareStatus{display:block;color:#93d9f2;font-size:11px;line-height:1.5;min-height:17px;margin-top:9px}
+@media(max-width:1100px){.mission-bar{left:18px;right:auto;transform:none;width:min(520px,57vw)}.rear-mirror{top:119px;width:190px}.mirror-heading,.mirror-footer{font-size:7px}#mirrorCanvas{height:69px}}
+@media(max-width:880px){.passenger-panel{display:none}.cab-dashboard{grid-template-columns:minmax(70px,90px) minmax(120px,1.6fr) minmax(80px,.8fr)}.control{min-width:56px;height:52px}.control strong{font-size:8px}.control small{font-size:7px}.topstats .tag{display:none}.mission-bar{width:min(460px,57vw)}.rear-mirror{max-width:31vw}}
+@media(max-width:700px){.brand small,.topstats .stars,.cab-marker,.footnote,.control small{display:none}.topbar{left:8px;right:8px}.brand strong{font-size:11px}.topstats{gap:3px}.topstats button{padding:5px 6px;font-size:10px}.cab-top{height:56px}.mission-bar{top:59px;left:8px;right:8px;transform:none;width:auto;min-height:37px;padding:5px 7px}.mission-icon{font-size:15px}.mission-bar strong{font-size:9px}.mission-bar small{font-size:7px}.challenge-status{display:none}.rear-mirror{top:106px;right:8px;width:156px;max-width:41vw;border-width:3px}.mirror-heading,.mirror-footer{padding:2px 4px;font-size:6px}#mirrorCanvas{height:59px}.cab-dashboard{left:8px;right:8px;bottom:113px;min-height:60px;grid-template-columns:67px 1fr 81px;gap:4px;padding:5px}.speed-dial{width:49px;height:49px;border-width:5px}.speed-dial span{font-size:18px}.speed-unit>div:last-child{display:none}.trip-display>strong{font-size:14px}.trip-display small{font-size:7px}.status-light strong{font-size:8px}.status-light small{font-size:7px}.status-light{gap:4px}.announcement{bottom:180px;font-size:9px;max-width:90%}.control-panel{left:7px;right:7px;bottom:7px;display:block}.control-group{justify-content:stretch;gap:4px;margin-top:4px}.control{height:49px;flex:1;min-width:0;max-width:none}.control span{font-size:14px}.control strong{font-size:7px}.modal{padding:19px}.station-sign{top:27%;font-size:8px}}
+@media(max-height:660px) and (min-width:701px){.cab-dashboard{bottom:65px;min-height:62px}.control-panel{bottom:8px}.control{height:47px}.cab-top{height:52px}.mission-bar{top:54px}.rear-mirror{top:65px}.announcement{bottom:132px}.cab-left,.cab-right{bottom:95px}.footnote{display:none}}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="world" aria-label="Three-dimensional train driver view through the front window"></canvas>
+  <div class="world-tint" aria-hidden="true"></div>
+  <div class="cab-top" aria-hidden="true"><div class="cab-marker">U1 <span>●</span> LEOPOLDAU</div></div>
+  <div class="cab-left" aria-hidden="true"></div><div class="cab-right" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand"><span class="route-label">U1</span><div><strong>VIENNA METRO DRIVER</strong><small>ADVENTURE EDITION • V2.2</small></div></div>
+    <div class="topstats"><span id="levelTag" class="tag">LEVEL 1 / 5</span><span class="stars">✦ <b id="score">0</b> PTS</span><button id="homeBtn" title="Return to home screen">⌂ Home</button><button id="pauseBtn" title="Pause (P)">Ⅱ Pause</button><button id="helpBtn" title="How to play">? Help</button></div>
+  </header>
+  <aside id="rearMirror" class="rear-mirror" aria-label="Live rear-facing side mirror showing platform passengers boarding and leaving the train">
+    <div class="mirror-heading"><span>◉ LIVE SIDE MIRROR</span><b id="mirrorStatus">Platform</b></div>
+    <canvas id="mirrorCanvas" width="440" height="176" role="img" aria-label="Animated platform and passenger movement at the metro doors"></canvas>
+    <div class="mirror-footer"><span id="mirrorFlow">PLATFORM CLEAR</span><span>↗ REAR DOORS</span></div>
+  </aside>
+  <section id="stationSign" class="station-sign hidden" aria-live="polite">NEXT STATION · <strong id="approachName">Neulaa</strong><small id="approachDistance">200 m</small></section>
+  <section class="mission-bar" aria-live="polite"><span class="mission-icon">★</span><div><small id="levelName">LEVEL 1 · FIRST SHIFT</small><strong id="missionText">Stop at Neulaa and welcome passengers.</strong></div><div id="challengeStatus" class="challenge-status">READY</div></section>
+  <section class="cab-dashboard" aria-label="Driver instruments">
+    <div class="speed-unit"><div class="speed-dial"><div class="dial-ticks" aria-hidden="true"></div><span id="speed">0</span></div><div><small>SPEED</small><strong>km/h</strong></div></div>
+    <div class="trip-display"><small>NEXT STOP <span id="remaining">240 m</span></small><strong id="nextStation">Neulaa</strong><div class="progress-track"><div id="progressFill"></div></div><small><span id="stopCount">1 OF 24</span> STATIONS · OBERLAA → LEOPOLDAU</small></div>
+    <div class="status-display"><div class="status-light"><span id="doorIndicator" class="lamp red"></span><div><small>DOORS</small><strong id="doorStatus">OPEN</strong></div></div><div class="status-light"><span id="brakeIndicator" class="lamp"></span><div><small>BRAKE</small><strong id="brakeStatus">RELEASED</strong></div></div></div>
+    <div class="passenger-panel"><small>PASSENGERS <span id="passengerCount">9</span> / 38</small><div id="passengerViz" class="passenger-viz" aria-label="Passengers seated and standing"></div><span id="passengerInfo">9 on board · 6 seated</span></div>
+  </section>
+  <div class="announcement" aria-live="polite"><span class="announcement-icon">◉</span><span id="announceText">Welcome aboard the U1 toward Leopoldau.</span></div>
+  <nav class="control-panel" aria-label="Train controls">
+    <div class="control-group"><button id="accelerateBtn" class="control action-go"><span>▲</span><strong>ACCELERATE</strong><small>W / ↑ (hold)</small></button><button id="brakeBtn" class="control action-brake"><span>▼</span><strong>BRAKE</strong><small>S / ↓ (hold)</small></button><button id="emergencyBtn" class="control action-emergency"><span>!</span><strong>EMERGENCY</strong><small>SPACE</small></button></div>
+    <div class="control-group secondary"><button id="leftBtn" class="control"><span>↶</span><strong>LEFT TRACK</strong><small>A / ←</small></button><button id="rightBtn" class="control"><span>↷</span><strong>RIGHT TRACK</strong><small>E / →</small></button><button id="doorsBtn" class="control action-door"><span>▯</span><strong id="doorsBtnLabel">CLOSE DOORS</strong><small>D</small></button><button id="lightsBtn" class="control"><span>☼</span><strong id="lightsBtnLabel">LIGHTS ON</strong><small>H</small></button></div>
+  </nav>
+  <div id="toast" class="toast" role="status"></div>
+  <div class="footnote"><span>FICTIONAL ADVENTURES · U1 STATION NAMES ARE REAL</span><span id="perf">3D RENDERER READY</span></div>
+  <div id="overlay" class="overlay"><div class="modal intro">
+    <div class="logo-orbit">🚇</div><span class="eyebrow">WELCOME • CLICK PLAY TO DRIVE</span>
+    <h1>Vienna Metro Driver <em>U1 Adventure</em></h1>
+    <p>Drive from <strong>Oberlaa</strong> to <strong>Leopoldau</strong> through all <strong>24 real U1 stations</strong>. Stop accurately, open your doors, carry passengers, and discover five impossible worlds!</p>
+    <div class="feature-pills"><span>🚇 3D driver's view</span><span>✦ 5 adventure levels</span><span>⇄ Secret switches</span><span>👥 Happy passengers</span></div>
+    <div class="modal-actions"><button class="primary" id="newGameBtn">▶ START NEW ADVENTURE</button><button class="outline" id="continueBtn" hidden>↻ CONTINUE SAVED RIDE</button></div>
+    <small class="instruction">W / ↑ = accelerate · S / ↓ = brake · D = doors · A / E = choose tracks · Space = emergency brake · P = pause</small>
+    <small class="disclaimer">A fan-made, fictional game prototype; not an official Wiener Linien simulator.</small>
+  </div></div>
+  <div id="helpOverlay" class="overlay hidden"><div class="modal help-modal"><button id="closeHelp" class="x">×</button><h2>HOW TO DRIVE</h2><p>You're driving from <b>Oberlaa</b> toward <b>Leopoldau</b>. The train starts with its doors open.</p><div class="help-grid"><div><kbd>W</kbd> or <kbd>↑</kbd><span>Hold to speed up</span></div><div><kbd>S</kbd> or <kbd>↓</kbd><span>Hold to slow down</span></div><div><kbd>D</kbd><span>Open or close doors at a station</span></div><div><kbd>A</kbd> / <kbd>E</kbd><span>Select left / right tracks near switches</span></div><div><kbd>SPACE</kbd><span>Emergency brake</span></div><div><kbd>H</kbd><span>Turn cabin headlights on/off</span></div><div><kbd>P</kbd><span>Pause/resume</span></div></div><p><b>Station challenge:</b> stop within 12 metres of your next platform, reach 0 km/h, press <kbd>D</kbd>, wait for passengers, then press <kbd>D</kbd> to close the doors. You cannot drive away with open doors. Missing a platform loses points but never ends your journey.</p><button class="primary" id="helpOkay">GOT IT!</button></div></div>
+</div>
+<script>
+/* Vienna Metro Driver: U1 Adventure — self-contained, original WebGL game.
+   No packages, network calls, copyrighted textures, or external sound files. */
+(() => {
+'use strict';
+const STATIONS = [
+ 'Oberlaa','Neulaa','Alaudagasse','Altes Landgut','Troststraße','Reumannplatz',
+ 'Keplerplatz','Südtiroler Platz – Hauptbahnhof','Taubstummengasse','Karlsplatz',
+ 'Stephansplatz','Schwedenplatz','Nestroyplatz','Praterstern','Vorgartenstraße',
+ 'Donauinsel','Kaisermühlen – VIC','Alte Donau','Kagran','Kagraner Platz',
+ 'Rennbahnweg','Aderklaaer Straße','Großfeldsiedlung','Leopoldau'
+];
+const LEVELS = [
+ {name:'FIRST SHIFT',world:'Vienna City Tunnels',desc:'Get comfortable driving your shiny new metro!',accent:[.24,.86,1]},
+ {name:'CRYSTAL CAVERN',world:'The Secret Crystal Line',desc:'A mysterious glowing underground kingdom awaits.',accent:[.72,.36,1]},
+ {name:'MOONLIGHT RUN',world:'Midnight Star Railway',desc:'Find your way through the magic midnight tunnel.',accent:[.35,.55,1]},
+ {name:'RAINBOW PORTAL',world:'Rainbow Dimension',desc:'Pick a track through the spectacular portals.',accent:[1,.46,.7]},
+ {name:'FINAL METEOR DASH',world:'The Meteor Express',desc:'Deliver your passengers to the final station!',accent:[1,.71,.33]}
+];
+const GAP=230, MAX_SPEED=82, CAPACITY=38, SAVE_KEY='vienna-metro-u1-adventure-v21-save'; // Keep v2.1 saves compatible
+const SWITCHES=[
+ {from:2,z:2.50*GAP,correct:'left'},
+ {from:7,z:7.50*GAP,correct:'right'},
+ {from:12,z:12.50*GAP,correct:'left'},
+ {from:17,z:17.50*GAP,correct:'right'},
+ {from:21,z:21.50*GAP,correct:'left'}
+];
+const COLORS={navy:[.08,.15,.24],metal:[.23,.38,.47],rail:[.76,.89,.95],timber:[.32,.36,.42],yellow:[1,.76,.2],red:[1,.25,.33],white:[.93,1,1]};
+const id = x => document.getElementById(x);
+const el={canvas:id('world'), overlay:id('overlay'),help:id('helpOverlay'), speed:id('speed'),score:id('score'),levelTag:id('levelTag'),levelName:id('levelName'),mission:id('missionText'),challenge:id('challengeStatus'),next:id('nextStation'),remaining:id('remaining'),stationSign:id('stationSign'),approach:id('approachName'),approachDistance:id('approachDistance'),progress:id('progressFill'), stopCount:id('stopCount'),passengerCount:id('passengerCount'),passengerInfo:id('passengerInfo'),passengerViz:id('passengerViz'),door:id('doorStatus'),doorLight:id('doorIndicator'),brake:id('brakeStatus'),brakeLight:id('brakeIndicator'),doorButton:id('doorsBtnLabel'),lightButton:id('lightsBtnLabel'),announcement:id('announceText'),toast:id('toast'),fps:id('perf'),mirrorCanvas:id('mirrorCanvas'),mirrorStatus:id('mirrorStatus'),mirrorFlow:id('mirrorFlow')};
+const clamp=(n,lo,hi)=>Math.max(lo,Math.min(hi,n));
+const lerp=(a,b,t)=>a+(b-a)*t;
+function initialState(){return {
+ started:false,paused:true,finished:false,position:0,speed:0,doorsOpen:true,lightsOn:true,
+ stationIndex:1,lastStationServed:0,boardingTimer:0,passengers:9,seated:6,score:0,
+ served:1,missed:0,brakes:0,bonus:0, choices:{},announced:-1, levelReached:0,
+ cleanRun:true, overSpeed:false, emergencyCooldown:0,time:0,stars:0,boardingFlow:null
+};}
+let s=initialState();let controls={accelerate:false,brake:false};
+let uiClock=0,saveClock=0,toastClock=0,voice=true,audioCtx=null,gameError=null,renderer=null;
+let lastFrame=0,fpsFrames=0,fpsClock=0,frameRate=0,renderClock=0;
+function save(){try{if(s.started)localStorage.setItem(SAVE_KEY,JSON.stringify({...s,paused:true,started:true}));}catch(e){/* storage unavailable */}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;const o=JSON.parse(raw);if(!o||!Number.isFinite(o.position)||!Number.isInteger(o.stationIndex)||o.stationIndex<1||o.stationIndex>24||!Number.isFinite(o.speed))return null;
+ return {...initialState(),...o,position:clamp(o.position,0,23*GAP+50),speed:clamp(o.speed,0,MAX_SPEED),passengers:clamp(o.passengers,0,CAPACITY),seated:clamp(o.seated,0,CAPACITY),choices:(o.choices&&typeof o.choices==='object')?o.choices:{},paused:true};}catch(e){return null}}
+function levelAtStation(i){return clamp(Math.floor(Math.max(0,i)/5),0,4)}
+function goalFor(i){
+ if(i>=STATIONS.length)return 'You have completed the entire U1 adventure!';
+ const sw=SWITCHES.find(x=>x.from+1===i);
+ if(sw)return `CHALLENGE: Choose the ${sw.correct.toUpperCase()} track, then stop at ${STATIONS[i]}.`;
+ if(i%5===0)return `NEW WORLD: Explore ${LEVELS[levelAtStation(i)].world} and collect 100 points.`;
+ if(i%4===1)return `PRECISION STOP: Park within 8 m of ${STATIONS[i]}.`;
+ if(i%4===2)return `SMOOTH RIDE: No emergency brakes before ${STATIONS[i]}.`;
+ if(i%4===3)return `SPEED CHALLENGE: Stay below 65 km/h until ${STATIONS[i]}.`;
+ return `PASSENGER EXPRESS: Welcome everyone at ${STATIONS[i]}.`;
+}
+function ping(freq=620,duration=.11){if(!voice)return;try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type='sine';osc.frequency.value=freq;g.gain.setValueAtTime(.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);osc.connect(g).connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+duration);}catch(e){/* optional sound */}}
+function say(text){el.announcement.textContent=text;if(voice && typeof speechSynthesis!=='undefined' && s.started){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=1.1;u.volume=.55;speechSynthesis.speak(u);}catch(e){/* optional speech */}}}
+function toast(message,secs=2.5){el.toast.textContent=message;el.toast.classList.add('visible');toastClock=secs;}
+function startNew(){s=initialState();s.started=true;s.paused=false;controls={accelerate:false,brake:false};el.overlay.classList.add('hidden');save();say('Welcome aboard! Close the doors before you accelerate. Next station: Neulaa.');toast('🚇 Your U1 adventure begins at Oberlaa!');updateHUD();}
+function resumeGame(){const data=load();if(!data){startNew();return;}s=data;s.started=true;s.paused=false;el.overlay.classList.add('hidden');say(`Welcome back! Next station: ${STATIONS[Math.min(s.stationIndex,23)]}.`);toast('↻ Saved adventure restored.');updateHUD();}
+function releaseControls(){controls.accelerate=false;controls.brake=false;for(const b of ['accelerateBtn','brakeBtn'])id(b).classList.remove('held');}
+function shareGame(){
+ const info=id('homeShareStatus');
+ const hosted=(location.protocol==='https:'||location.protocol==='http:')&&!['localhost','127.0.0.1'].includes(location.hostname);
+ if(!hosted){info.textContent='To let friends play from a public link, upload index.html to GitHub Pages or another static web host. The local HTML file is not a public website.';return;}
+ const url=location.origin+location.pathname;
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(url).then(()=>{info.textContent='✓ Game link copied! You can send it to your friends.';}).catch(()=>{info.textContent='Copy this game address: '+url;});
+ }else{info.textContent='Copy this game address: '+url;}
+}
+function showHome(){
+ s.paused=true;releaseControls();if(s.started)save();el.help.classList.add('hidden');
+ const saved=load(),canContinue=saved&&!saved.finished;
+ const modal=el.overlay.querySelector('.modal');modal.className='modal intro';
+ modal.innerHTML=`<div class="logo-orbit">🚇</div><span class="eyebrow">WELCOME TO THE DRIVER'S CAB</span><h1>Vienna Metro Driver <em>U1 Adventure</em></h1><p>Drive through <b>24 stations</b> from Oberlaa to Leopoldau. Pick your track, open the doors for passengers, and unlock five adventure worlds!</p><div class="home-route"><span>OBERLAA</span><span class="route-line"></span><span>LEOPOLDAU</span></div><div class="feature-pills"><span>🚇 Cab view</span><span>👥 Live mirror</span><span>✦ 5 levels</span><span>⇄ Track switches</span></div><div class="modal-actions"><button class="primary" id="newGameBtn">▶ PLAY FROM OBERLAA</button>${canContinue?'<button class="outline" id="continueBtn">↻ CONTINUE RIDE</button>':''}<button class="outline" id="shareBtn">↗ SHARE GAME LINK</button></div><span id="homeShareStatus" role="status"></span><small class="instruction">W / ↑ drive · S / ↓ brake · D doors · A / E switch tracks · Space emergency · P pause</small><small class="disclaimer">Fan-made fictional prototype • Not affiliated with Wiener Linien • Each computer saves its own progress</small>`;
+ id('newGameBtn').onclick=startNew;
+ if(canContinue)id('continueBtn').onclick=resumeGame;
+ id('shareBtn').onclick=shareGame;
+ el.overlay.classList.remove('hidden');updateHUD();
+}
+function showMenu(kind='pause'){
+ s.paused=true;releaseControls();save();
+ const modal=el.overlay.querySelector('.modal');
+ if(kind==='pause'){
+ modal.innerHTML=`<div class="logo-orbit">🚇</div><span class="eyebrow">YOUR ADVENTURE IS PAUSED</span><h1>Take a little <em>station break</em></h1><p>Next stop: <b>${escapeHTML(STATIONS[Math.min(s.stationIndex,23)])}</b> · Score: <b>${s.score}</b> · Passengers: <b>${s.passengers}</b></p><div class="modal-actions"><button id="resumeBtn" class="primary">▶ RESUME RIDE</button><button id="restartBtn" class="outline">↻ RESTART FROM OBERLAA</button><button id="returnHomeBtn" class="outline">⌂ HOME</button></div><small class="instruction">Progress is saved on this computer.</small>`;
+ id('resumeBtn').onclick=()=>{el.overlay.classList.add('hidden');s.paused=false;};id('restartBtn').onclick=startNew;id('returnHomeBtn').onclick=showHome;
+ } else if(kind==='finish'){
+ modal.innerHTML=`<div class="logo-orbit">🏆</div><span class="eyebrow">YOU DID IT, METRO DRIVER!</span><h1>U1 Adventure <em>COMPLETE!</em></h1><p>You drove all the way to <b>Leopoldau</b>!<br>Stations served: <b>${s.served}/24</b> · Passengers on board: <b>${s.passengers}</b><br>Final score: <b>${s.score} points</b> · Missed stations: <b>${s.missed}</b></p><div class="feature-pills"><span>✨ Crystal Cavern</span><span>🌙 Moonlight Run</span><span>🌈 Rainbow Portal</span><span>☄️ Meteor Dash</span></div><div class="modal-actions"><button id="restartBtn" class="primary">▶ PLAY AGAIN</button><button id="returnHomeBtn" class="outline">⌂ HOME SCREEN</button></div><small class="instruction">Every journey can be an exciting new challenge!</small>`;
+ id('restartBtn').onclick=startNew;id('returnHomeBtn').onclick=showHome;
+ }
+ el.overlay.classList.remove('hidden');
+}
+function escapeHTML(str){return str.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function nearPlatform(){return Math.round(s.position/GAP)}
+function toggleDoors(){
+ if(!s.started||s.paused||s.finished)return;
+ if(s.doorsOpen){
+  if(s.boardingTimer>0){toast('🚶 Passengers are boarding — wait until they are safely aboard!');return;}
+  s.doorsOpen=false;s.boardingFlow=null;ping(730);toast('Doors closed and locked. Safe to depart!');save();updateHUD();return;
+ }
+ if(s.speed>1){toast('🚫 Stop the train before opening the doors!');ping(160);return;}
+ const p=nearPlatform(),gap=Math.abs(s.position-p*GAP);
+ if(p<0||p>=STATIONS.length||gap>12){toast('🚫 Align the train with a station platform (within 12 m).');return;}
+ if(p>s.stationIndex){toast('This station is not your scheduled stop!');return;}
+ s.doorsOpen=true;ping(540);s.boardingTimer=0;
+ if(p===s.stationIndex){
+  const precision=Math.abs(s.position-p*GAP),gotBranch=SWITCHES.find(x=>x.from+1===p);
+  const cleanBonus=(s.cleanRun&&!s.overSpeed)?40:0;
+  let challengeBonus=0;
+  if(gotBranch && s.choices[gotBranch.from]===gotBranch.correct)challengeBonus=50;
+  else if(p%4===1&&precision<=8)challengeBonus=35;
+  else if(p%4===2&&s.cleanRun)challengeBonus=35;
+  else if(p%4===3&&!s.overSpeed)challengeBonus=35;
+  const earned=100+Math.round((12-precision)*4)+cleanBonus+challengeBonus;
+  s.score+=earned;s.bonus+=challengeBonus;s.served++;s.lastStationServed=p;
+  const leaving=Math.min(s.passengers,2+(p*7)%6),boarding=Math.min(CAPACITY-(s.passengers-leaving),3+(p*11)%9);
+  s.passengers=s.passengers-leaving+boarding;s.seated=Math.min(s.passengers,Math.floor(s.passengers*.68));
+  s.boardingTimer=2.2;s.boardingFlow={station:p,boarding,leaving};s.stationIndex++;
+  s.cleanRun=true;s.overSpeed=false;s.announced=-1;
+  say(`${STATIONS[p]}. Doors opening. ${leaving} passengers leaving and ${boarding} boarding.`);
+  toast(`★ ${STATIONS[p]} — +${earned} points! (${boarding} boarding, ${leaving} leaving)`,3);
+  const newLevel=levelAtStation(p);
+  if(newLevel>s.levelReached){s.levelReached=newLevel;s.score+=200;toast(`✨ LEVEL ${newLevel+1} UNLOCKED: ${LEVELS[newLevel].name}! +200 BONUS`,4);}
+  if(p===23){s.finished=true;s.boardingTimer=1.0;}
+ } else {toast(`Doors opened at ${STATIONS[p]}.`);say(`${STATIONS[p]}. Doors opening.`);}
+ save();updateHUD();
+}
+function chooseTrack(side){
+ if(!s.started||s.paused||s.finished)return;
+ const sw=SWITCHES.find(x=>s.position>=x.z-145&&s.position<x.z+9);
+ if(!sw){toast('⇄ A track switch is not close enough yet. Watch for the glowing arrows!');return;}
+ s.choices[sw.from]=side;ping(side==='left'?480:620);
+ toast(`${side==='left'?'↶':'↷'} ${side.toUpperCase()} TRACK SELECTED! ${side===sw.correct?'Perfect choice!':'Enjoy the alternate secret tunnel!'}`,3);
+ save();
+}
+function emergencyBrake(){if(!s.started||s.paused||s.finished)return;if(s.speed<.2)return;s.emergencyCooldown=1.4;s.cleanRun=false;s.brakes++;s.score=Math.max(0,s.score-15);toast('⚠ EMERGENCY BRAKE! -15 points');ping(180,.2);}
+function toggleLights(){if(!s.started||s.paused||s.finished)return;s.lightsOn=!s.lightsOn;toast(`Headlights ${s.lightsOn?'ON':'OFF'}`);updateHUD();}
+function missStop(){
+ const i=s.stationIndex;if(i>=24)return;
+ s.stationIndex++;s.missed++;s.score=Math.max(0,s.score-110);s.announced=-1;s.cleanRun=false;
+ if(i===23){s.finished=true;s.boardingTimer=.7;}
+ say(`You missed ${STATIONS[i]}. Continue to the next station.`);toast(`⚠ MISSED ${STATIONS[i]}! -110 points. Keep driving!`,4);
+ save();
+}
+function step(dt){
+ if(!s.started||s.paused)return;
+ dt=clamp(dt,0,.075);s.time+=dt;
+ if(s.finished){s.boardingTimer=Math.max(0,s.boardingTimer-dt);if(s.boardingTimer===0){showMenu('finish');save();}return;}
+ if(s.boardingTimer>0){s.boardingTimer=Math.max(0,s.boardingTimer-dt);if(s.finished&&s.boardingTimer===0){showMenu('finish');save();return;}}
+ if(s.emergencyCooldown>0)s.emergencyCooldown=Math.max(0,s.emergencyCooldown-dt);
+ const holdGo=controls.accelerate&&!s.doorsOpen&&!s.emergencyCooldown&&!s.boardingTimer;
+ const braking=controls.brake||s.emergencyCooldown>0;
+ let acc=holdGo?13.5:0;
+ if(braking)acc=-((s.emergencyCooldown>0)?57:28);
+ if(!holdGo&&!braking)acc=-1.9;
+ s.speed=clamp(s.speed+acc*dt,0,MAX_SPEED);
+ if(s.doorsOpen)s.speed=0;
+ const before=s.position;
+ s.position=clamp(s.position+s.speed/3.6*dt,0,23*GAP+65);
+ if(s.speed>65)s.overSpeed=true;
+ const next=s.stationIndex;
+ if(next<24){
+  const d=next*GAP-s.position;
+  if(d<95 && d>=-12 && s.announced!==next){s.announced=next;say(`Next station: ${STATIONS[next]}. Prepare to stop.`);ping(750);}
+  if(d < -30)missStop();
+ }
+ for(const sw of SWITCHES){if(before<sw.z&&s.position>=sw.z&&!(sw.from in s.choices)){
+   s.choices[sw.from]='right';toast('↷ Automatic RIGHT track selected at the junction.');
+ }}
+ saveClock+=dt;if(saveClock>=5){saveClock=0;save();}
+}
+function updateHUD(){
+ const n=Math.min(23,s.stationIndex),dist=s.stationIndex<24?Math.round(s.stationIndex*GAP-s.position):0;
+ el.speed.textContent=Math.round(s.speed);el.score.textContent=s.score.toLocaleString('en-US');
+ const l=levelAtStation(s.stationIndex<24?s.stationIndex:23);
+ el.levelTag.textContent=`LEVEL ${l+1} / 5`;el.levelName.textContent=`LEVEL ${l+1} · ${LEVELS[l].name}`;
+ el.mission.textContent=s.finished?'Mission accomplished! Final stop: Leopoldau.':goalFor(s.stationIndex);
+ const sw=SWITCHES.find(x=>x.z-s.position>=-3&&x.z-s.position<145);
+ el.challenge.textContent=sw?`SWITCH: ${Math.round(sw.z-s.position)}m`:(s.doorsOpen?'DOORS OPEN':s.speed>65?'SLOW DOWN':dist<65?'BRAKE & STOP':'ON TRACK');
+ el.next.textContent=s.stationIndex<24?STATIONS[n]:'Route complete';
+ el.remaining.textContent=s.stationIndex<24?`${Math.max(0,dist)} m`:'0 m';
+ el.stopCount.textContent=`${Math.min(24,s.stationIndex+1)} OF 24`;
+ el.progress.style.width=`${clamp((s.position/(GAP*23))*100,0,100)}%`;
+ el.passengerCount.textContent=s.passengers;el.passengerInfo.textContent=`${s.passengers} on board · ${s.seated} seated`;
+ el.door.textContent=s.doorsOpen?'OPEN':'LOCKED';el.doorLight.className=`lamp ${s.doorsOpen?'red':''}`;
+ el.brake.textContent=s.emergencyCooldown?'EMERGENCY':controls.brake?'APPLIED':'RELEASED';
+ el.brakeLight.className=`lamp ${s.emergencyCooldown?'red':controls.brake?'yellow':''}`;
+ el.doorButton.textContent=s.doorsOpen?'CLOSE DOORS':'OPEN DOORS';el.lightButton.textContent=s.lightsOn?'LIGHTS ON':'LIGHTS OFF';
+ const near=dist<145&&dist>-37&&!s.finished;el.stationSign.classList.toggle('hidden',!near);
+ if(near){el.approach.textContent=STATIONS[n];el.approachDistance.textContent=dist>=0?`${dist} metres to platform`:'You have passed the platform!';}
+ const peopleShown=Math.min(14,s.passengers);
+ const html=[];for(let i=0;i<peopleShown;i++)html.push(`<i class="person ${i<s.seated?'sitting':''}" style="--shirt:${['#ff8e7c','#75c8ea','#d4a9ff','#84e8b8','#ffd18c'][i%5]}"></i>`);
+ el.passengerViz.innerHTML=html.join('');
+}
+// The auxiliary view is drawn independently of the forward 3-D camera.
+// Boarding/alighting figures move in opposite directions using the real passenger-exchange timer.
+const mirrorCtx=el.mirrorCanvas.getContext('2d');
+function drawMirror(){
+ if(!mirrorCtx)return;
+ const c=mirrorCtx,w=c.canvas.width,h=c.canvas.height;
+ const p=nearPlatform(),near=Math.abs(s.position-p*GAP)<=62 && p>=0 && p<STATIONS.length;
+ const atPlatform=near&&Math.abs(s.position-p*GAP)<=12&&s.speed<1;
+ const exchange=atPlatform&&s.doorsOpen&&s.boardingTimer>0&&s.boardingFlow&&s.boardingFlow.station===p;
+ const moving=!near||s.speed>1;
+ const flow=exchange?s.boardingFlow:null;
+ const progress=exchange?clamp(1-s.boardingTimer/2.2,0,1):0;
+ let grad=c.createLinearGradient(0,0,0,h);grad.addColorStop(0,moving?'#102434':'#31526b');grad.addColorStop(1,moving?'#172b3e':'#6b8191');
+ mirrorCtx.fillStyle=grad;mirrorCtx.fillRect(0,0,w,h);
+ // Metallic train skin occupies the left and platform extends to the right.
+ mirrorCtx.fillStyle='#304b61';mirrorCtx.fillRect(0,12,191,143);
+ mirrorCtx.fillStyle='#d5e5ec';mirrorCtx.fillRect(4,28,178,8);
+ mirrorCtx.fillStyle='#e82441';mirrorCtx.fillRect(0,50,190,9);
+ mirrorCtx.fillStyle='#0c1e30';mirrorCtx.fillRect(0,68,95,67);
+ mirrorCtx.fillStyle='#50718a';mirrorCtx.fillRect(5,74,81,50);
+ mirrorCtx.fillStyle='#aed9ee';mirrorCtx.fillRect(10,77,71,39);
+ const opening=s.doorsOpen&&atPlatform;
+ const d=opening?20:0;
+ mirrorCtx.fillStyle='#1d3245';mirrorCtx.fillRect(103,52,86,102);
+ mirrorCtx.fillStyle='#84adbd';mirrorCtx.fillRect(108-d,57,35,94);mirrorCtx.fillRect(151+d,57,33,94);
+ mirrorCtx.fillStyle='#33495f';mirrorCtx.fillRect(114-d,64,24,38);mirrorCtx.fillRect(155+d,64,23,38);
+ mirrorCtx.strokeStyle='#d8e8f3';mirrorCtx.lineWidth=3;mirrorCtx.strokeRect(103,52,86,102);
+ // Consistent perspective across the platform and waiting line.
+ mirrorCtx.fillStyle=moving?'#263847':'#65717f';mirrorCtx.fillRect(192,115,248,61);
+ mirrorCtx.fillStyle=moving?'#405066':'#e2c951';mirrorCtx.fillRect(197,116,243,5);
+ mirrorCtx.fillStyle='#a9d0e0';mirrorCtx.fillRect(225,27,208,5);
+ mirrorCtx.fillStyle='#15314a';mirrorCtx.fillRect(284,42,133,26);
+ mirrorCtx.fillStyle='#8ce7f1';mirrorCtx.font='bold 16px system-ui';
+ mirrorCtx.fillText(near?STATIONS[p].slice(0,12).toUpperCase():'U1 • TUNNEL',292,61);
+ if(moving){
+  const offset=(s.position*2.2)%115;
+  for(let k=0;k<5;k++){const x=(k*110-offset+550)%550+192;mirrorCtx.fillStyle='#627e95';mirrorCtx.fillRect(x,65,8,48);}
+ }else{
+  function person(x,y,shirt,scale=1){
+   mirrorCtx.save();mirrorCtx.translate(x,y);mirrorCtx.scale(scale,scale);
+   mirrorCtx.fillStyle='#172a3c';mirrorCtx.fillRect(-6,0,5,15);mirrorCtx.fillRect(3,0,5,15);
+   mirrorCtx.fillStyle=shirt;mirrorCtx.fillRect(-11,-29,22,30);
+   mirrorCtx.fillStyle='#edbd94';mirrorCtx.beginPath();mirrorCtx.arc(0,-38,9,0,Math.PI*2);mirrorCtx.fill();
+   mirrorCtx.restore();
+  }
+  if(exchange){
+   const countOut=Math.min(4,flow.leaving),countIn=Math.min(4,flow.boarding);
+   for(let i=0;i<countOut;i++){const t=clamp(progress*1.35-i*.13,0,1);person(145+205*t,144+(i%2)*8,['#fb8a8a','#bb92f0','#efcf67','#63c9d7'][i],.78);}
+   for(let i=0;i<countIn;i++){const t=clamp(progress*1.35-i*.13,0,1);person(389-235*t,139+(i%2)*10,['#64e3ba','#edbf68','#e4a6fb','#60bade'][i],.82);}
+  }else{
+   for(let i=0;i<4;i++)person(241+i*49,147+(i%2)*7,['#6edbcc','#ffba70','#aa9eff','#f2869c'][i],.78);
+  }
+ }
+ // Glass reflection sheen on top, and a subtle border to clarify this is a mirror.
+ mirrorCtx.fillStyle='rgba(213,246,255,.075)';mirrorCtx.beginPath();mirrorCtx.moveTo(15,0);mirrorCtx.lineTo(93,0);mirrorCtx.lineTo(30,h);mirrorCtx.lineTo(0,h);mirrorCtx.closePath();mirrorCtx.fill();
+ mirrorCtx.strokeStyle='#bed5e7';mirrorCtx.lineWidth=3;mirrorCtx.strokeRect(1,1,w-2,h-2);
+ const status=exchange?'PASSENGER EXCHANGE':atPlatform?(s.doorsOpen?'DOORS OPEN':'DOORS LOCKED'):(near?'APPROACHING':'IN MOTION');
+ if(el.mirrorStatus.textContent!==status)el.mirrorStatus.textContent=status;
+ const label=exchange?`↙ ${flow.leaving} OUT    ↗ ${flow.boarding} IN`:moving?'TRACKSIDE VIEW':atPlatform&&s.doorsOpen?'WATCH FOR PASSENGERS':'PLATFORM VIEW';
+ if(el.mirrorFlow.textContent!==label)el.mirrorFlow.textContent=label;
+}
+function bindHold(button,key){const b=id(button);const pressed=()=>{controls[key]=true;b.classList.add('held');};const released=()=>{controls[key]=false;b.classList.remove('held');};b.addEventListener('pointerdown',e=>{e.preventDefault();pressed();try{b.setPointerCapture(e.pointerId);}catch(_){}});b.addEventListener('pointerup',released);b.addEventListener('pointercancel',released);b.addEventListener('lostpointercapture',released);window.addEventListener('blur',released);}
+bindHold('accelerateBtn','accelerate');bindHold('brakeBtn','brake');
+id('doorsBtn').onclick=toggleDoors;id('leftBtn').onclick=()=>chooseTrack('left');id('rightBtn').onclick=()=>chooseTrack('right');id('emergencyBtn').onclick=emergencyBrake;id('lightsBtn').onclick=toggleLights;
+id('homeBtn').onclick=showHome;
+id('pauseBtn').onclick=()=>{if(!s.started||s.finished||(!el.overlay.classList.contains('hidden')&&!!id('newGameBtn')))return;if(s.paused){el.overlay.classList.add('hidden');s.paused=false;}else showMenu('pause');};
+id('helpBtn').onclick=()=>{if(!s.started)return;window.helpWasPaused=s.paused;s.paused=true;releaseControls();el.help.classList.remove('hidden');};
+function closeHelp(){el.help.classList.add('hidden');s.paused=Boolean(window.helpWasPaused);}
+id('closeHelp').onclick=closeHelp;id('helpOkay').onclick=closeHelp;
+// Home screen creates and binds the Play, Continue and Share buttons dynamically.
+window.addEventListener('keydown',e=>{
+ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space',' '].includes(e.key))e.preventDefault();
+ if(e.repeat && !['ArrowUp','ArrowDown','w','W','s','S'].includes(e.key))return;
+ if(e.key==='w'||e.key==='W'||e.key==='ArrowUp')controls.accelerate=true;
+ if(e.key==='s'||e.key==='S'||e.key==='ArrowDown')controls.brake=true;
+ if(e.repeat)return;
+ if(e.key==='d'||e.key==='D')toggleDoors();
+ if(e.key==='a'||e.key==='A'||e.key==='ArrowLeft')chooseTrack('left');
+ if(e.key==='e'||e.key==='E'||e.key==='ArrowRight')chooseTrack('right');
+ if(e.key===' '||e.key==='Space')emergencyBrake();
+ if(e.key==='h'||e.key==='H')toggleLights();
+ if(e.key==='p'||e.key==='P')id('pauseBtn').click();
+ if(e.key==='Escape'&&!el.help.classList.contains('hidden'))closeHelp();
+});
+window.addEventListener('keyup',e=>{
+ if(['w','W','ArrowUp'].includes(e.key))controls.accelerate=false;
+ if(['s','S','ArrowDown'].includes(e.key))controls.brake=false;
+});window.addEventListener('blur',()=>{controls.accelerate=false;controls.brake=false;});
+showHome();
+
+// Original low-poly WebGL renderer. All geometry, shaders and colors are generated locally.
+const VS=`attribute vec3 aPosition; attribute vec3 aColor; uniform vec3 uCamera;uniform float uYaw;uniform float uFocal;uniform float uAspect;varying vec3 vColor;varying float vDepth;void main(){vec3 p=aPosition-uCamera;float c=cos(uYaw),si=sin(uYaw);float xx=p.x*c-p.z*si;float zz=p.x*si+p.z*c;gl_Position=vec4(xx*uFocal/uAspect,p.y*uFocal,zz*1.001-0.45,zz);vColor=aColor;vDepth=zz;}`;
+const FS=`precision mediump float;varying vec3 vColor;varying float vDepth;uniform vec3 uFog;uniform float uBrightness;void main(){float f=clamp((vDepth-65.0)/245.0,0.0,0.87);vec3 rgb=mix(vColor*uBrightness,uFog,f);gl_FragColor=vec4(rgb,1.0);}`;
+function compileShader(gl,kind,source){const sh=gl.createShader(kind);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw new Error('Shader compile: '+gl.getShaderInfoLog(sh));return sh;}
+function create3D(canvas){
+ const gl=canvas.getContext('webgl',{antialias:true,alpha:false,powerPreference:'high-performance'})||canvas.getContext('experimental-webgl');
+ // Browser with disabled WebGL (including some managed/school PCs): run the exact
+ // same 3-D world geometry through a software perspective triangle renderer.
+ const software=!gl,ctx=software?canvas.getContext('2d',{alpha:false}):null;
+ if(software&&!ctx)throw new Error('Neither WebGL nor Canvas 2D graphics are available.');
+ let prog,buffer,camU,yawU,focalU,aspectU,fogU,brightU;
+ if(gl){
+  prog=gl.createProgram();gl.attachShader(prog,compileShader(gl,gl.VERTEX_SHADER,VS));gl.attachShader(prog,compileShader(gl,gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error('Shader link: '+gl.getProgramInfoLog(prog));gl.useProgram(prog);
+  const attrPos=gl.getAttribLocation(prog,'aPosition'),attrCol=gl.getAttribLocation(prog,'aColor');
+  camU=gl.getUniformLocation(prog,'uCamera');yawU=gl.getUniformLocation(prog,'uYaw');focalU=gl.getUniformLocation(prog,'uFocal');aspectU=gl.getUniformLocation(prog,'uAspect');fogU=gl.getUniformLocation(prog,'uFog');brightU=gl.getUniformLocation(prog,'uBrightness');
+  buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.enableVertexAttribArray(attrPos);gl.enableVertexAttribArray(attrCol);gl.vertexAttribPointer(attrPos,3,gl.FLOAT,false,24,0);gl.vertexAttribPointer(attrCol,3,gl.FLOAT,false,24,12);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
+ }
+ let verts=[];const scaled=(c,k)=>c.map(x=>clamp(x*k,0,1));
+ function triangle(a,b,c,color){for(const p of [a,b,c])verts.push(p[0],p[1],p[2],...color);}
+ function quad(a,b,c,d,color){triangle(a,b,c,color);triangle(a,c,d,color);}
+ function box(x,y,z,w,h,d,col){
+  const x0=x-w/2,x1=x+w/2,y0=y-h/2,y1=y+h/2,z0=z-d/2,z1=z+d/2;
+  const A=[x0,y0,z0],B=[x1,y0,z0],C=[x1,y1,z0],D=[x0,y1,z0],E=[x0,y0,z1],F=[x1,y0,z1],G=[x1,y1,z1],H=[x0,y1,z1];
+  quad(A,D,C,B,scaled(col,.76));quad(E,F,G,H,scaled(col,.88));quad(D,H,G,C,scaled(col,1.13));quad(A,B,F,E,scaled(col,.58));quad(A,E,H,D,scaled(col,.84));quad(B,C,G,F,scaled(col,.95));
+ }
+ function beam(x0,z0,x1,z1,width,height,color,y=.16){
+  const dx=x1-x0,dz=z1-z0,len=Math.hypot(dx,dz)||1,offX=dz/len*width/2,offZ=-dx/len*width/2;
+  const a=[x0-offX,y,z0-offZ],b=[x0+offX,y,z0+offZ],c=[x1+offX,y,z1+offZ],d=[x1-offX,y,z1-offZ];
+  quad(a,b,c,d,scaled(color,1.04));
+  quad([a[0],y-height,a[2]],a,d,[d[0],y-height,d[2]],scaled(color,.58));
+  quad(b,[b[0],y-height,b[2]],[c[0],y-height,c[2]],c,scaled(color,.7));
+ }
+ function crystal(x,y,z,size,color){
+  const top=[x,y+size*2.8,z],bot=[x,y,z],corners=[];
+  for(let n=0;n<5;n++){const a=n*Math.PI*2/5;corners.push([x+Math.cos(a)*size,y+size*.8,z+Math.sin(a)*size]);}
+  for(let n=0;n<5;n++){triangle(top,corners[n],corners[(n+1)%5],scaled(color,.7+(n%3)*.2));triangle(bot,corners[(n+1)%5],corners[n],scaled(color,.4+(n%2)*.2));}
+ }
+ function figure(x,z,shirt,n){
+  const bounce=.03*Math.sin(s.time*2+n*3);
+  box(x,.84+bounce,z,.40,.93,.25,shirt);box(x,1.52+bounce,z,.30,.31,.28,[.94,.72,.56]);
+  box(x-.14,.22+bounce,z,.10,.47,.17,[.16,.21,.31]);box(x+.14,.22+bounce,z,.10,.47,.17,[.16,.21,.31]);
+ }
+ function pathBase(z){return 1.85*Math.sin(z/175)+.9*Math.sin(z/74);}
+ function branchWave(z,sw,choice){const delta=z-sw.z;if(delta<0||delta>140)return 0;const k=Math.sin(Math.PI*delta/140);return (choice==='left'?-1:1)*5.8*k*k;}
+ function pathX(z){let x=pathBase(z);for(const sw of SWITCHES){if(z<sw.z||z>sw.z+140)continue;const choice=s.choices[sw.from]||'right';x+=branchWave(z,sw,choice);}return x;}
+ function branchHere(z){return SWITCHES.find(sw=>z>=sw.z&&z<=sw.z+140);}
+ function track(x0,z0,x1,z1,dim){
+  const col=dim?[.41,.66,.78]:COLORS.rail;
+  beam(x0-.92,z0,x1-.92,z1,.13,.12,col,.20);beam(x0+.92,z0,x1+.92,z1,.13,.12,col,.20);
+ }
+ function stationPlatform(i,from,to,theme){
+  const zp=i*GAP;if(zp<from-60||zp>to+60)return;
+  const acc=theme.accent;
+  for(let t=Math.max(-56,Math.floor((from-zp)/12)*12);t<57&&zp+t<to+14;t+=12){
+   const z=zp+t+6;if(z<from-12)continue;const x=pathX(z);
+   box(x+5.25,-.13,z,6.5,.58,12.2,[.43,.48,.55]);
+   box(x+2.17,.22,z,.25,.12,12.1,COLORS.yellow);
+   box(x+8.42,.43,z,.15,1.55,12.1,[.27,.38,.52]);
+   if(t%24===0){box(x+7.85,3.35,z,.42,6.2,.5,scaled(acc,.46));box(x+5.6,5.52,z,5.9,.25,1.4,scaled(acc,.85));}
+  }
+  const signs=[-34,15,39];
+  for(const q of signs){const z=zp+q;if(z<from-25||z>to+25)continue;const x=pathX(z);box(x+7.8,2.9,z,1.05,.98,5.2,[.13,.28,.44]);box(x+7.48,2.9,z,1.05,.64,4.3,[.16,.58,.8]);box(x+7.2,2.92,z,1.09,.12,3.9,[.77,.95,1]);}
+  for(let n=0;n<7;n++){
+   const z=zp-45+n*14;if(z<from-12||z>to+12)continue;
+   const x=pathX(z);const boarding=s.doorsOpen&&s.lastStationServed===i&&Math.abs(s.position-zp)<13;const phase=boarding?1-clamp(s.boardingTimer/2.2,0,1):0;const startX=4.0+(n%3)*1.1;const boardX=n%2===0?2.6:7.0;const passengerX=clamp(lerp(startX,boardX,phase),2.6,7.1);figure(x+passengerX,z,[ [.95,.30,.40],[.2,.77,.84],[.96,.75,.31],[.55,.43,.9] ][(i+n)%4],i*13+n);
+  }
+ }
+ function render(){
+  const width=canvas.clientWidth||window.innerWidth,height=canvas.clientHeight||window.innerHeight,dpr=software?1:Math.min(1.5,window.devicePixelRatio||1);
+  if(canvas.width!==Math.round(width*dpr)||canvas.height!==Math.round(height*dpr)){canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);if(gl)gl.viewport(0,0,canvas.width,canvas.height);}
+  const here=Math.floor(Math.max(0,s.position)/GAP),l=levelAtStation(here),theme=LEVELS[l],night=l===2;
+  const wall=night?[.095,.115,.23]:l===1?[.18,.14,.30]:l===3?[.22,.17,.29]:l===4?[.28,.18,.22]:[.13,.23,.31];
+  const fog=night?[.035,.055,.16]:l===1?[.13,.065,.26]:l===3?[.20,.075,.23]:[.08,.16,.22];
+  if(gl){gl.clearColor(...fog,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);}else{ctx.fillStyle=`rgb(${fog.map(v=>Math.round(v*255)).join(',')})`;ctx.fillRect(0,0,canvas.width,canvas.height);}
+  verts=[];
+  const from=Math.max(0,Math.floor((s.position-23)/12)*12),to=Math.min(GAP*23+130,s.position+(software?205:300));
+  // Ventilated tunnel, curved continuously with the track. Rail lighting and stations have real 3D geometry.
+  for(let z=from;z<to;z+=12){
+   const c=pathX(z+6),seg=Math.min(12,to-z),zz=z+seg/2;
+   box(c,-.50,zz,22,.56,seg+.3,[.21,.27,.35]);
+   box(c-10.6,3.1,zz,.6,7,seg+.1,wall);box(c+10.7,3.1,zz,.6,7,seg+.1,wall);
+   box(c,6.6,zz,22,.47,seg+.2,scaled(wall,.82));
+   if(Math.floor(z/12)%2===0){
+    box(c-10.19,3.16,zz,.12,4.0,2.8,scaled(theme.accent,.44));
+    box(c+10.2,3.16,zz,.12,4.0,2.8,scaled(theme.accent,.38));
+    box(c,6.19,zz,5.1,.14,1.0,s.lightsOn?[.48,.77,.86]:[.15,.23,.28]);
+   }
+   if(Math.floor(z/12)%4===0){box(c-7.7,.15,zz,.5,.45,1.2,[.22,.35,.44]);box(c+7.7,.15,zz,.5,.45,1.2,[.22,.35,.44]);}
+   if(l===1&&Math.floor(z/12)%3===0){crystal(c-7.1,.0,zz,1.1+Math.abs(Math.sin(z))*.3,[.3,.74,1]);crystal(c+7.4,0,zz+3,.7,[.88,.4,1]);}
+   if(l===2&&Math.floor(z/12)%2===0){for(let k=0;k<3;k++){const xx=c-8+((Math.sin(z+k*5.7)*17+20)%16);box(xx,5.5+(k%2)*.35,zz+2, .12,.12,.12,[.95,.93,.62]);}}
+   if(l===3&&Math.floor(z/12)%3===0){for(let j=0;j<5;j++)box(c-7.5+j*3.6,5.87,zz,.55,.75,.55,[[1,.3,.4],[1,.7,.3],[.3,1,.6],[.3,.7,1],[.9,.4,1]][j]);}
+   if(l===4&&Math.floor(z/12)%3===0){crystal(c+7.3,0,zz,.85,[1,.64,.27]);crystal(c-7.3,0,zz+3,.65,[1,.27,.38]);}
+  }
+  // Sleepers and rails follow geometry; at junctions both selectable rail paths are physically rendered.
+  for(let z=from;z<to-1;z+=5){
+   const z1=Math.min(z+5,to),sw=branchHere(z+2.5);
+   if(sw){
+    for(const side of ['left','right']){
+      const x0=pathBase(z)+branchWave(z,sw,side),x1=pathBase(z1)+branchWave(z1,sw,side);
+      track(x0,z,x1,z1,side!== (s.choices[sw.from]||'right'));
+      if(Math.floor(z/5)%2===0)beam(x0-1.55,z,x0+1.55,z,.30,.12,COLORS.timber,-.025);
+    }
+   }else{
+    const x0=pathX(z),x1=pathX(z1);track(x0,z,x1,z1,false);
+    if(Math.floor(z/5)%2===0)beam(x0-1.55,z,x0+1.55,z,.30,.12,COLORS.timber,-.025);
+   }
+  }
+  for(let i=0;i<STATIONS.length;i++)stationPlatform(i,from,to,theme);
+  for(const sw of SWITCHES){if(sw.z<from||sw.z>to)continue;
+    const cx=pathBase(sw.z),c2=pathBase(sw.z+45);
+    for(const side of ['left','right']){
+      const signX=c2+(side==='left'?-4.3:4.3),chosen=s.choices[sw.from]===side;
+      box(signX,3.9,sw.z+41,1.6,1.8,.38,chosen?[.45,.98,.56]:[.30,.55,.75]);
+      box(signX,4,sw.z+40.76,.95,.9,.15,side==='left'?[.95,.61,.35]:[.4,.89,1]);
+    }
+    box(cx,5.72,sw.z,5,.15,.3,[1,.75,.23]);
+  }
+  // Signals and floating station approach arrows give visual feedback.
+  const targetZ=s.stationIndex*GAP;
+  if(s.stationIndex<24&&targetZ>from&&targetZ<to){const c=pathX(targetZ);box(c-3.4,3.5,targetZ-70,.35,4,.35,[.31,.5,.56]);box(c-3.4,5.4,targetZ-70,1.1,1.2,.45,[.11,.22,.32]);box(c-3.4,5.5,targetZ-70, .52,.52,.5,s.speed>65?[1,.2,.2]:[.3,1,.56]);}
+  const aimDelta=pathX(s.position+28)-pathX(s.position),yaw=Math.atan2(aimDelta,28)*.68;
+  const eye=[pathX(s.position),2.55,s.position+1.5];
+  const brightness=s.lightsOn?1:(night?.36:.7);
+  if(gl){
+   gl.uniform3fv(camU,eye);gl.uniform1f(yawU,yaw);gl.uniform1f(focalU,1.73);gl.uniform1f(aspectU,canvas.width/canvas.height);
+   gl.uniform3fv(fogU,fog);gl.uniform1f(brightU,brightness);
+   const arr=new Float32Array(verts);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,arr,gl.DYNAMIC_DRAW);gl.drawArrays(gl.TRIANGLES,0,arr.length/6);
+  }else{
+   const tris=[],c=Math.cos(yaw),si=Math.sin(yaw),halfW=canvas.width/2,halfH=canvas.height/2,focal=1.73*halfH;
+   // Painter algorithm with 3D near-plane clipping; still correct perspective,
+   // curved rails and depth ordering without any browser GPU support.
+   function transform(offset){const x=verts[offset]-eye[0],z=verts[offset+2]-eye[2];return [x*c-z*si,verts[offset+1]-eye[1],x*si+z*c];}
+   function inside(p){return p[2]>=.3;}
+   function clipTriangle(ps){const clipped=[];for(let j=0;j<ps.length;j++){const a=ps[j],b=ps[(j+1)%ps.length],ia=inside(a),ib=inside(b);if(ia)clipped.push(a);if(ia!==ib){const q=(.3-a[2])/(b[2]-a[2]);clipped.push([lerp(a[0],b[0],q),lerp(a[1],b[1],q),.3]);}}return clipped;}
+   for(let i=0;i<verts.length;i+=18){
+    const ps=clipTriangle([transform(i),transform(i+6),transform(i+12)]);if(ps.length<3)continue;
+    const maxZ=Math.max(...ps.map(p=>p[2]));
+    const screen=ps.map(p=>[halfW+p[0]*focal/p[2],halfH-p[1]*focal/p[2]]);
+    if(screen.every(p=>p[0]<-10)||screen.every(p=>p[0]>canvas.width+10)||screen.every(p=>p[1]<-10)||screen.every(p=>p[1]>canvas.height+10))continue;
+    const avgZ=ps.reduce((r,p)=>r+p[2],0)/ps.length;
+    const fogF=clamp((avgZ-65)/245,0,.87);
+    const rgb=[0,1,2].map(j=>Math.round(255*(verts[i+3+j]*brightness*(1-fogF)+fog[j]*fogF)));
+    tris.push([maxZ,screen,`rgb(${rgb.join(',')})`]);
+   }
+   tris.sort((a,b)=>b[0]-a[0]);
+   for(const t of tris){const p=t[1];ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);for(let j=1;j<p.length;j++)ctx.lineTo(p[j][0],p[j][1]);ctx.closePath();ctx.fillStyle=t[2];ctx.fill();}
+  }
+  return {triangles:verts.length/18,vertices:verts.length/6};
+ }
+ return {render, gl, mode:software?'software-3d':'webgl'};
+}
+try{renderer=create3D(el.canvas);}catch(err){gameError=String(err);id('perf').textContent='3D ERROR: '+gameError;toast(gameError,30);}
+function frame(now){
+ if(!lastFrame)lastFrame=now;
+ const dt=Math.min((now-lastFrame)/1000,.07);lastFrame=now;
+ step(dt);uiClock+=dt;fpsClock+=dt;fpsFrames++;
+ if(uiClock>=.13){updateHUD();uiClock=0;}
+ if(toastClock>0){toastClock-=dt;if(toastClock<=0)el.toast.classList.remove('visible');}
+ if(!renderer)drawMirror();if(renderer){try{renderClock+=dt;if(renderer.gl||renderClock>=1/24){const stats=renderer.render();drawMirror();renderClock=0;if(fpsClock>1.1){frameRate=Math.round(fpsFrames/fpsClock);el.fps.textContent=`${renderer.mode==='software-3d'?'SOFTWARE':'WEBGL'} 3D • ${frameRate} FPS • ${stats.triangles.toLocaleString()} TRIANGLES`;fpsFrames=0;fpsClock=0;}}}catch(e){gameError=String(e);renderer=null;el.fps.textContent='3D RENDER ERROR';toast(gameError,10);}}
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+// The QA interface is present ONLY when ?qa=1 is explicitly supplied by a tester.
+// It advances the same production physics and mission logic as normal gameplay.
+if(new URLSearchParams(location.search).has('qa')){
+ window.__qa={
+  snapshot:()=>JSON.parse(JSON.stringify({...s,renderError:gameError,fps:frameRate,levels:LEVELS.map(x=>x.name),stations:STATIONS})),
+  tick:(seconds=1)=>{let n=Math.floor(seconds/.05),left=seconds-n*.05;for(let k=0;k<n;k++)step(.05);if(left>0)step(left);updateHUD();},
+  controls:(acc,brk)=>{controls.accelerate=!!acc;controls.brake=!!brk;},
+  pressDoors:toggleDoors,chooseTrack,emergencyBrake,lights:toggleLights,
+  newGame:startNew,resume:resumeGame,pause:()=>showMenu('pause'),
+  save,loaded:load,
+  resetSave:()=>{try{localStorage.removeItem(SAVE_KEY);}catch(e){}},
+  home:showHome,share:shareGame,mirrorStatus:()=>({status:el.mirrorStatus.textContent,flow:el.mirrorFlow.textContent}),
+  setPositionForTest:(position)=>{s.position=clamp(position,0,23*GAP+65);s.speed=0;updateHUD();},
+  setSpeedForTest:(speed)=>{s.speed=clamp(speed,0,MAX_SPEED);updateHUD();},
+  stationGap:GAP,realStationNames:STATIONS
+ };
+}
+})();
+
+</script>
+</body>
+</html>
